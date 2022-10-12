@@ -1,4 +1,61 @@
+controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    projectile = sprites.createProjectileFromSprite(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . 1 5 5 5 . . . . . . 
+        . . . . . 4 5 5 5 2 5 . . . . . 
+        . 4 . . 5 5 1 1 1 5 5 4 . . . . 
+        5 . 4 4 4 1 1 1 1 1 4 2 . . . . 
+        . 5 . . 4 4 1 1 4 4 4 4 . . . . 
+        . . . 5 . 4 4 2 4 5 4 . . . . . 
+        . . . . . . 4 4 4 4 . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `, spaceShip, 200, 0)
+    music.pewPew.play()
+})
+sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Enemy, function (sprite, otherSprite) {
+    otherSprite.destroy()
+    sprite.destroy()
+    music.baDing.play()
+    info.changeScoreBy(1)
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
+    scene.cameraShake(4, 500)
+    otherSprite.destroy()
+    music.powerDown.play()
+    info.changeLifeBy(-1)
+})
+let bandit: Sprite = null
+let projectile: Sprite = null
+let spaceShip: Sprite = null
 game.splash("GALGA")
+spaceShip = sprites.create(img`
+    ..ccc.........ffffff....
+    ..f9cc.......fcc88ff....
+    ..f99cc...fffccccff.....
+    ..f899cccc88889998cc....
+    ..f889cc8888888899b9c...
+    ..cf8888888888888b999c..
+    .c88c888888888b11199b8c.
+    f88ccccccc888899111b888c
+    fffffcc888c888888888888f
+    .....f8888998888888888f.
+    ....f888899fc8888888ff..
+    ...c888899ffffffffff....
+    ...c8888cfffc8f.........
+    ...ffffffff8ccf.........
+    .......ffff8cf..........
+    ........fffff...........
+    `, SpriteKind.Player)
+spaceShip.setStayInScreen(true)
+info.setLife(3)
+controller.moveSprite(spaceShip, 200, 200)
 scene.setBackgroundImage(img`
     ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
     ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
@@ -121,4 +178,31 @@ scene.setBackgroundImage(img`
     3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
     3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333
     `)
-scroller.scrollBackgroundWithSpeed(-20, 0)
+scroller.scrollBackgroundWithSpeed(-50, 0)
+forever(function () {
+    music.playMelody("E B C5 A B G A F ", 218)
+})
+game.onUpdateInterval(500, function () {
+    bandit = sprites.create(img`
+        ....ffffff.........ccc..
+        ....ff22ccf.......cc4f..
+        .....ffccccfff...cc44f..
+        ....cc24442222cccc442f..
+        ...c9b4422222222cc422f..
+        ..c999b2222222222222fc..
+        .c2b99111b222222222c22c.
+        c222b111992222ccccccc22f
+        f222222222222c222ccfffff
+        .f2222222222442222f.....
+        ..ff2222222cf442222f....
+        ....ffffffffff442222c...
+        .........f2cfffc2222c...
+        .........fcc2ffffffff...
+        ..........fc2ffff.......
+        ...........fffff........
+        `, SpriteKind.Enemy)
+    bandit.setVelocity(-100, 0)
+    bandit.left = scene.screenWidth()
+    bandit.y = randint(0, scene.screenHeight())
+    bandit.setFlag(SpriteFlag.AutoDestroy, true)
+})
